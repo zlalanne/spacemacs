@@ -129,7 +129,8 @@ values."
    ;; `recents' `bookmarks' `projects' `agenda' `todos'."
    ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
-   dotspacemacs-startup-lists '((recents . 5)
+   dotspacemacs-startup-lists '((agenda . 4)
+                                (recents . 5)
                                 (projects . 7))
    ;; True if the home buffer should respond to resize events.
    dotspacemacs-startup-buffer-responsive t
@@ -358,9 +359,73 @@ you should place your code here."
 
   ;; org-mode
   (setq org-todo-keywords
-        '((sequence "TODO" "WAITING" "|" "DONE" "DELEGATED")))
+        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+          (sequence "WAITING(w@/!)" "|" "CANCELED(c@/!)" "MEETING")))
   ;; Don't include a footer with my contact and publishing information at the bottom
   (setq org-html-postamble nil)
+
+  (setq org-directory (file-truename "~/org"))
+
+  (defun org-file-path (filename)
+    "Return the absolute address of an org file, given its relative name."
+    (concat (file-name-as-directory org-directory) filename))
+
+  (setq org-index-file (org-file-path "index.org"))
+  (setq org-archive-mark-done nil)
+  (setq org-archive-location
+        (concat (org-file-path "archive.org") "::* From %s"))
+  (defun zl/mark-done-and-archive ()
+    "Mark the state of an org-mode item as DONE and archive it."
+    (interactive)
+    (org-todo 'done)
+    (org-archive-subtree))
+
+  (define-key org-mode-map (kbd "C-c C-x C-s") 'zl/mark-done-and-archive)
+
+  (setq org-capture-templates
+        '(("b" "Blog idea"
+           entry
+           (file (org-file-path "blog-ideas.org"))
+           "* TODO %?\n")
+
+          ("g" "Groceries"
+           checkitem
+           (file (org-file-path "groceries.org")))
+
+          ("l" "Today I Learned..."
+           entry
+           (file+datetree (org-file-path "til.org"))
+           "* %?\n")
+
+          ("r" "Reading"
+           checkitem
+           (file (org-file-path "to-read.org")))
+
+          ("t" "Todo"
+           entry
+           (file+headline org-index-file "Inbox")
+           "* TODO %?\n%U\n")))
+  (setq org-agenda-files (list org-index-file))
+
+  (defun open-index-file ()
+    "Open the master org TODO list."
+    (interactive)
+    (find-file org-index-file)
+    (flycheck-mode -1)
+    (end-of-buffer))
+
+  (global-set-key (kbd "C-c i") 'open-index-file)
+
+  (setq org-refile-targets '((nil :maxlevel . 2)
+                             (org-agenda-files :maxlevel . 2)))
+  ;; Refile in a single go
+  (setq org-outline-path-complete-in-steps nil)
+  ;; Show full paths for refiling
+  (setq org-refile-use-outline-path t)
+
+  ;; Some keybindings
+  (global-set-key (kbd "<f12>") 'org-agenda)
+
   )
 
 
