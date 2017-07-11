@@ -358,75 +358,76 @@ you should place your code here."
   ;; Always follow symlinks
   (setq vc-follow-symlinks nil)
 
-  ;; org-mode
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-          (sequence "WAITING(w@/!)" "|" "CANCELED(c@/!)" "MEETING")))
-  ;; Don't include a footer with my contact and publishing information at the bottom
-  (setq org-html-postamble nil)
+  (with-eval-after-load 'org
+    ;; org-mode
+    (setq org-todo-keywords
+          '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+            (sequence "WAITING(w@/!)" "|" "CANCELED(c@/!)" "MEETING")))
+    ;; Don't include a footer with my contact and publishing information at the bottom
+    (setq org-html-postamble nil)
 
-  (setq org-directory (file-truename "~/org"))
+    (setq org-directory (file-truename "~/org"))
 
-  (defun org-file-path (filename)
-    "Return the absolute address of an org file, given its relative name."
-    (concat (file-name-as-directory org-directory) filename))
+    (defun org-file-path (filename)
+      "Return the absolute address of an org file, given its relative name."
+      (concat (file-name-as-directory org-directory) filename))
 
-  (setq org-index-file (org-file-path "index.org"))
-  (setq org-archive-mark-done nil)
-  (setq org-archive-location
-        (concat (org-file-path "archive.org") "::* From %s"))
-  (defun zl/mark-done-and-archive ()
-    "Mark the state of an org-mode item as DONE and archive it."
-    (interactive)
-    (org-todo 'done)
-    (org-archive-subtree))
+    (setq org-index-file (org-file-path "index.org"))
+    (setq org-archive-mark-done nil)
+    (setq org-archive-location
+          (concat (org-file-path "archive.org") "::* From %s"))
+    (defun zl/mark-done-and-archive ()
+      "Mark the state of an org-mode item as DONE and archive it."
+      (interactive)
+      (org-todo 'done)
+      (org-archive-subtree))
 
-  (define-key org-mode-map (kbd "C-c C-x C-s") 'zl/mark-done-and-archive)
+    (define-key org-mode-map (kbd "C-c C-x C-s") 'zl/mark-done-and-archive)
 
-  (setq org-capture-templates
-        '(("b" "Blog idea"
-           entry
-           (file (org-file-path "blog-ideas.org"))
-           "* TODO %?\n")
+    (setq org-capture-templates
+          '(("b" "Blog idea"
+            entry
+            (file (org-file-path "blog-ideas.org"))
+            "* TODO %?\n")
 
-          ("g" "Groceries"
-           checkitem
-           (file (org-file-path "groceries.org")))
+            ("g" "Groceries"
+            checkitem
+            (file (org-file-path "groceries.org")))
 
-          ("l" "Today I Learned..."
-           entry
-           (file+datetree (org-file-path "til.org"))
-           "* %?\n")
+            ("l" "Today I Learned..."
+            entry
+            (file+datetree (org-file-path "til.org"))
+            "* %?\n")
 
-          ("r" "Reading"
-           checkitem
-           (file (org-file-path "to-read.org")))
+            ("r" "Reading"
+            checkitem
+            (file (org-file-path "to-read.org")))
 
-          ("t" "Todo"
-           entry
-           (file+headline org-index-file "Inbox")
-           "* TODO %?\n%U\n")))
-  (setq org-agenda-files (list org-index-file))
+            ("t" "Todo"
+            entry
+            (file+headline org-index-file "Inbox")
+            "* TODO %?\n%U\n")))
+    (setq org-agenda-files (list org-index-file))
 
-  (defun open-index-file ()
-    "Open the master org TODO list."
-    (interactive)
-    (find-file org-index-file)
-    (flycheck-mode -1)
-    (end-of-buffer))
+    (defun open-index-file ()
+      "Open the master org TODO list."
+      (interactive)
+      (find-file org-index-file)
+      (flycheck-mode -1)
+      (end-of-buffer))
 
-  (global-set-key (kbd "C-c i") 'open-index-file)
+    (global-set-key (kbd "C-c i") 'open-index-file)
 
-  (setq org-refile-targets '((nil :maxlevel . 2)
-                             (org-agenda-files :maxlevel . 2)))
-  ;; Refile in a single go
-  (setq org-outline-path-complete-in-steps nil)
-  ;; Show full paths for refiling
-  (setq org-refile-use-outline-path t)
+    (setq org-refile-targets '((nil :maxlevel . 2)
+                              (org-agenda-files :maxlevel . 2)))
+    ;; Refile in a single go
+    (setq org-outline-path-complete-in-steps nil)
+    ;; Show full paths for refiling
+    (setq org-refile-use-outline-path t)
 
-  ;; Some keybindings
-  (global-set-key (kbd "<f12>") 'org-agenda)
-
+    ;; Some keybindings
+    (global-set-key (kbd "<f12>") 'org-agenda)
+    )
   )
 
 
@@ -440,6 +441,7 @@ you should place your code here."
  '(evil-want-Y-yank-to-eol nil)
  '(package-selected-packages
    (quote
+    ())))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
